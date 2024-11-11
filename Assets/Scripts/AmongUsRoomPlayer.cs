@@ -12,12 +12,12 @@ public class AmongUsRoomPlayer : NetworkRoomPlayer
     {
         get
         {
-            if(myRoomPlayer == null)
+            if (myRoomPlayer == null)
             {
                 var players = FindObjectsOfType<AmongUsRoomPlayer>();
-                foreach(var player in players)
+                foreach (var player in players)
                 {
-                    if(player.hasAuthority)
+                    if (player.hasAuthority)
                     {
                         myRoomPlayer = player;
                     }
@@ -46,13 +46,13 @@ public class AmongUsRoomPlayer : NetworkRoomPlayer
     {
         base.Start();
 
-        if(isServer)
+        if (isServer)
         {
             SpawnLobbyPlayerCharacter();
             LobbyUIManager.Instance.ActiveStartButton();
         }
 
-        if(isLocalPlayer)
+        if (isLocalPlayer)
         {
             CmdSetNickname(PlayerSettings.nickname);
         }
@@ -62,7 +62,7 @@ public class AmongUsRoomPlayer : NetworkRoomPlayer
 
     private void OnDestroy()
     {
-        if(LobbyUIManager.Instance != null)
+        if (LobbyUIManager.Instance != null)
         {
             LobbyUIManager.Instance.GameRoomPlayerCount.UpdatePlayerCount();
             LobbyUIManager.Instance.CustomizeUI.UpdateUnselectColorButton(playerColor);
@@ -85,37 +85,58 @@ public class AmongUsRoomPlayer : NetworkRoomPlayer
 
     private void SpawnLobbyPlayerCharacter()
     {
-        var roomSlots = (NetworkManager.singleton as AmongUsRoomManager).roomSlots;
-        EPlayerColor color = EPlayerColor.Red;
-        for(int i=0; i<(int)EPlayerColor.Lime + 1; i++)
-        {
-            bool isFindSameColor = false;
-            foreach(var roomPlayer in roomSlots)
-            {
-                var amongUsRoomPlayer = roomPlayer as AmongUsRoomPlayer;
-                if(amongUsRoomPlayer.playerColor == (EPlayerColor)i && roomPlayer.netId != netId)
-                {
-                    isFindSameColor = true;
-                    break;
-                }
-            }
-
-            if(!isFindSameColor)
-            {
-                color = (EPlayerColor)i;
-                break;
-            }
-        }
-        playerColor = color;
-
+        // Utilisez votre manager pour obtenir la position de spawn
         var spawnPositions = FindObjectOfType<SpawnPositions>();
-        int index = spawnPositions.Index;
-        Vector3 spawnPos = spawnPositions.GetSpawnPosition();
+        Vector3 spawnPos = spawnPositions.GetSpawnPosition(); // position actuelle de spawn
 
-        var playerCharacter = Instantiate(AmongUsRoomManager.singleton.spawnPrefabs[0], spawnPos, Quaternion.identity).GetComponent<LobbyCharacterMover>();
-        playerCharacter.transform.localScale = index < 5 ? new Vector3(0.5f, 0.5f, 1f) : new Vector3(-0.5f, 0.5f, 1f);
+        // Instanciez le personnage à partir du prefab
+        var playerCharacter = Instantiate(NetworkManager.singleton.spawnPrefabs[0], spawnPos, Quaternion.identity).GetComponent<LobbyCharacterMover>();
+
+        // Configurez l'échelle si nécessaire (ex : pour la symétrie de placement)
+        playerCharacter.transform.localScale = spawnPositions.Index < 5 ? new Vector3(0.5f, 0.5f, 1f) : new Vector3(-0.5f, 0.5f, 1f);
+
+        // Faites l'apparition du joueur côté serveur pour synchroniser avec le client
         NetworkServer.Spawn(playerCharacter.gameObject, connectionToClient);
+
+        // Associez les informations du joueur
         playerCharacter.ownerNetId = netId;
-        playerCharacter.playerColor = color;
+        playerCharacter.playerColor = playerColor;
     }
+
+
+    // private void SpawnLobbyPlayerCharacter()
+    // {
+    //     var roomSlots = (NetworkManager.singleton as AmongUsRoomManager).roomSlots;
+    //     EPlayerColor color = EPlayerColor.Red;
+    //     for(int i=0; i<(int)EPlayerColor.Lime + 1; i++)
+    //     {
+    //         bool isFindSameColor = false;
+    //         foreach(var roomPlayer in roomSlots)
+    //         {
+    //             var amongUsRoomPlayer = roomPlayer as AmongUsRoomPlayer;
+    //             if(amongUsRoomPlayer.playerColor == (EPlayerColor)i && roomPlayer.netId != netId)
+    //             {
+    //                 isFindSameColor = true;
+    //                 break;
+    //             }
+    //         }
+
+    //         if(!isFindSameColor)
+    //         {
+    //             color = (EPlayerColor)i;
+    //             break;
+    //         }
+    //     }
+    //     playerColor = color;
+
+    //     var spawnPositions = FindObjectOfType<SpawnPositions>();
+    //     int index = spawnPositions.Index;
+    //     Vector3 spawnPos = spawnPositions.GetSpawnPosition();
+
+    //     var playerCharacter = Instantiate(AmongUsRoomManager.singleton.spawnPrefabs[0], spawnPos, Quaternion.identity).GetComponent<LobbyCharacterMover>();
+    //     playerCharacter.transform.localScale = index < 5 ? new Vector3(0.5f, 0.5f, 1f) : new Vector3(-0.5f, 0.5f, 1f);
+    //     NetworkServer.Spawn(playerCharacter.gameObject, connectionToClient);
+    //     playerCharacter.ownerNetId = netId;
+    //     playerCharacter.playerColor = color;
+    // }
 }

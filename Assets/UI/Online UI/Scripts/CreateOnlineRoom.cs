@@ -18,7 +18,6 @@ public class CreateOnlineRoom : MonoBehaviour
     {
         // Initialize room data with default values
         roomData = new CreateGameRoomData() { imposterCount = 1, maxPlayerCount = 4 };
-        Debug.Log("hehe");
     }
 
     public void OnClickCreateRoomButton()
@@ -26,7 +25,6 @@ public class CreateOnlineRoom : MonoBehaviour
         if (nicknameInputField.text != "" && nicknameInputField.text != "Pseudo")
         {
             PlayerSettings.nickname = nicknameInputField.text;
-            Debug.Log("clicked" + nicknameInputField.text);
             CreateRoom();
             gameObject.SetActive(false);
         }
@@ -53,8 +51,6 @@ public class CreateOnlineRoom : MonoBehaviour
     public void CreateRoom()
     {
         var manager = NetworkManager.singleton as AmongUsRoomManager;
-        Debug.Log("create room entered");
-
         manager.minPlayerCount = 3;
         manager.imposterCount = 1;
         manager.maxConnections = 4;

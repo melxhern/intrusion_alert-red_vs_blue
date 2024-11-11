@@ -16,21 +16,21 @@ public class SortingSprite : MonoBehaviour
 
     private SpriteRenderer spriteRenderer;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        sorter = FindObjectOfType<SpriteSorter>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+    // // Start is called before the first frame update
+    // void Start()
+    // {
+    //     sorter = FindObjectOfType<SpriteSorter>();
+    //     spriteRenderer = GetComponent<SpriteRenderer>();
 
-        spriteRenderer.sortingOrder = sorter.GetSortingOrder(gameObject);
-    }
+    //     spriteRenderer.sortingOrder = sorter.GetSortingOrder(gameObject);
+    // }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if(sortingType == ESortingType.Updata)
-        {
-            spriteRenderer.sortingOrder = sorter.GetSortingOrder(gameObject);
-        }
-    }
+    // // Update is called once per frame
+    // void Update()
+    // {
+    //     if(sortingType == ESortingType.Updata)
+    //     {
+    //         spriteRenderer.sortingOrder = sorter.GetSortingOrder(gameObject);
+    //     }
+    // }
 }
